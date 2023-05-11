@@ -28,10 +28,17 @@ fn right_fork(i: u8) -> u8 {
 
 fn take_forks(philosopher_id: u8, control_mutex: Arc<Mutex<()>>, fork_mutexes: Arc<Vec<Mutex<()>>>) {
     let control_mutex_guard = control_mutex.lock().unwrap();
+    let left = &fork_mutexes.clone()[left_fork(philosopher_id) as usize];
+    let right = &fork_mutexes.clone()[right_fork(philosopher_id) as usize];
+    loop {
+        left.try_lock().and_then(|| right.try_lock())
+    }
     println!("{:?} has acquired a control_mutex", thread::current().name());
 }
 
 fn put_forks_back(philosopher_id: u8, control_mutex: Arc<Mutex<()>>, fork_mutexes: Arc<Vec<Mutex<()>>>) {
+    let control_mutex_guard = control_mutex.lock().unwrap();
+    println!("{:?} has acquired a control_mutex", thread::current().name());
 
 }
 
