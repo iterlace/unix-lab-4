@@ -3,9 +3,9 @@ use std::thread;
 use std::time::Duration;
 use rand::Rng;
 
-const PHILOSOPHERS_COUNT: u8 = 6;
-const THINKING_DURATION: u8 = 15;  // in seconds
-const EATING_DURATION: u8 = 1;
+const PHILOSOPHERS_COUNT: u32 = 1000;
+const THINKING_DURATION: u32 = 5;  // in seconds
+const EATING_DURATION: u32 = 1;
 
 //
 //      o2  —3—  o3
@@ -18,20 +18,21 @@ const EATING_DURATION: u8 = 1;
 // To eat, a philosopher must acquire —N— and —(N+1)—
 // When philosopher intends to eat, they acquire a global control lock.
 
-fn left_fork(i: u8) -> u8 {
+fn left_fork(i: u32) -> u32 {
     return i;
 }
 
-fn right_fork(i: u8) -> u8 {
+fn right_fork(i: u32) -> u32 {
     return (i+1) % PHILOSOPHERS_COUNT;
 }
 
-fn log(msg: &str, philosopher_id: u8) {
-    let whitespaces = " ".repeat((philosopher_id * 4) as usize);
+fn log(msg: &str, philosopher_id: u32) {
+    // let whitespaces = " ".repeat((philosopher_id * 4) as usize);
+    let whitespaces = "";
     println!("{}{} {}", whitespaces, philosopher_id+1, msg);
 }
 
-fn take_forks_and_eat(philosopher_id: u8, control_mutex: Arc<Mutex<()>>, fork_mutexes: Arc<Vec<Mutex<()>>>) {
+fn take_forks_and_eat(philosopher_id: u32, control_mutex: Arc<Mutex<()>>, fork_mutexes: Arc<Vec<Mutex<()>>>) {
     let left = &fork_mutexes.clone()[left_fork(philosopher_id) as usize];
     let right = &fork_mutexes.clone()[right_fork(philosopher_id) as usize];
 
@@ -66,12 +67,12 @@ fn take_forks_and_eat(philosopher_id: u8, control_mutex: Arc<Mutex<()>>, fork_mu
     // release forks as well
 }
 
-fn think(philosopher_id: u8) -> () {
+fn think(philosopher_id: u32) -> () {
     log(format!("THINKING FOR {}sec...", THINKING_DURATION).as_str(), philosopher_id);
     thread::sleep(Duration::from_secs(THINKING_DURATION as u64));
 }
 
-fn philosopher(philosopher_id: u8, control_mutex: Arc<Mutex<()>>, fork_mutexes: Arc<Vec<Mutex<()>>>) {
+fn philosopher(philosopher_id: u32, control_mutex: Arc<Mutex<()>>, fork_mutexes: Arc<Vec<Mutex<()>>>) {
     loop {
         think(philosopher_id.clone());
         take_forks_and_eat(philosopher_id, control_mutex.clone(), fork_mutexes.clone());
