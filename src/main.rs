@@ -3,7 +3,7 @@ use std::thread;
 use std::time::Duration;
 use rand::Rng;
 
-const PHILOSOPHERS_COUNT: u8 = 5;
+const PHILOSOPHERS_COUNT: u8 = 6;
 const THINKING_DURATION: u8 = 15;  // in seconds
 const EATING_DURATION: u8 = 1;
 
@@ -28,7 +28,7 @@ fn right_fork(i: u8) -> u8 {
 
 fn log(msg: &str, philosopher_id: u8) {
     let whitespaces = " ".repeat((philosopher_id * 4) as usize);
-    println!("{}{} {}", whitespaces, philosopher_id, msg);
+    println!("{}{} {}", whitespaces, philosopher_id+1, msg);
 }
 
 fn take_forks_and_eat(philosopher_id: u8, control_mutex: Arc<Mutex<()>>, fork_mutexes: Arc<Vec<Mutex<()>>>) {
@@ -50,7 +50,7 @@ fn take_forks_and_eat(philosopher_id: u8, control_mutex: Arc<Mutex<()>>, fork_mu
                     .and_then(|rmg| {
                         left_mutex_guard = Some(lmg);
                         right_mutex_guard = Some(rmg);
-                        log("has acquired both forks", philosopher_id);
+                        log("ACQUIRED FORKS", philosopher_id);
                         Ok(())
                     })
                 )
@@ -60,13 +60,14 @@ fn take_forks_and_eat(philosopher_id: u8, control_mutex: Arc<Mutex<()>>, fork_mu
         // log("has released a control_mutex", philosopher_id);
     }
 
-    log("has started eating their meal", philosopher_id);
+    log("STARTED EATING", philosopher_id);
     thread::sleep(Duration::from_secs(EATING_DURATION as u64));
-    log("has finished eating their meal", philosopher_id);
+    log("FINISHED EATING", philosopher_id);
+    // release forks as well
 }
 
 fn think(philosopher_id: u8) -> () {
-    log(format!("is thinking for {} seconds...", THINKING_DURATION).as_str(), philosopher_id);
+    log(format!("THINKING FOR {}sec...", THINKING_DURATION).as_str(), philosopher_id);
     thread::sleep(Duration::from_secs(THINKING_DURATION as u64));
 }
 
