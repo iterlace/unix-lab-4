@@ -4,8 +4,8 @@ use std::time::Duration;
 use rand::Rng;
 
 const PHILOSOPHERS_COUNT: u8 = 5;
-const THINKING_DURATION: u8 = 4;  // in seconds
-const EATING_DURATION: u8 = 5;
+const THINKING_DURATION: u8 = 15;  // in seconds
+const EATING_DURATION: u8 = 1;
 
 //
 //      o2  —3—  o3
@@ -40,9 +40,9 @@ fn take_forks_and_eat(philosopher_id: u8, control_mutex: Arc<Mutex<()>>, fork_mu
 
     {
         // wait for control_mutex, and then acquire it
-        log("is waiting for control_mutex", philosopher_id);
-        let control_mutex_guard = control_mutex.lock().unwrap();
-        log("has acquired a control_mutex", philosopher_id);
+        // log("is waiting for control_mutex", philosopher_id);
+        // let control_mutex_guard = control_mutex.lock().unwrap();
+        // log("has acquired a control_mutex", philosopher_id);
 
         while left_mutex_guard.is_none() && right_mutex_guard.is_none() {
             left.try_lock()
@@ -55,8 +55,9 @@ fn take_forks_and_eat(philosopher_id: u8, control_mutex: Arc<Mutex<()>>, fork_mu
                     })
                 )
                 .unwrap_or_else(|_| ());
+            thread::sleep(Duration::from_nanos(0));
         }
-        log("has released a control_mutex", philosopher_id);
+        // log("has released a control_mutex", philosopher_id);
     }
 
     log("has started eating their meal", philosopher_id);
